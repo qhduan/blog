@@ -1,0 +1,105 @@
+<!Doctype html>
+<html xmlns=http://www.w3.org/1999/xhtml>
+  <head>
+    <meta http-equiv=Content-Type content="text/html;charset=utf-8">
+    <title> The Length </title>
+  </head>
+  <body>
+    <script>      
+      /*
+       * from http://www.math.ucla.edu/~tom/distributions/normal.html
+       */
+       
+      function normalcdf(X){   //HASTINGS.  MAX ERROR = .000001
+        var T=1/(1+.2316419*Math.abs(X));
+        var D=.3989423*Math.exp(-X*X/2);
+        var Prob=D*T*(.3193815+T*(-.3565638+T*(1.781478+T*(-1.821256+T*1.330274))));
+        if (X>0) {
+          Prob=1-Prob
+        }
+        return Prob
+      }   
+
+      function compute(Z, M, SD) {
+        if (SD<0) {
+          alert("The standard deviation must be nonnegative.")
+        } else if (SD==0) {
+            if (Z<M){
+                Prob=0
+            } else {
+              Prob=1
+          }
+        } else {
+          Prob = normalcdf((Z-M)/SD);
+          Prob = Math.round(100000*Prob)/100000;
+        }
+        return Prob;
+      }
+      
+      function DoLength (e) {
+        var val = e.target.value;
+        var x = parseFloat(val);
+        if (x) {
+          // from http://www.free-condom-stuff.com/education/research.htm
+          var result = compute(x, 14.928, 2.096);
+          // from 10.3969/j.issn.1001-1420.2007.11.009
+          var result2 = compute(x, 10.46, 0.91);
+          result *= 100;
+          result = result.toFixed(2) + "%";
+          result2 *= 100;
+          result2 = result2.toFixed(2) + "%";
+          document.getElementById("lengthResult").innerHTML = "You beat " + result + " men in the world." + "<br>" +
+            "You beat " + result2 + " men in China.";
+        } else {
+          document.getElementById("lengthResult").innerHTML = "Invalid input";
+        }
+      }
+      
+      function DoGirth (e) {
+        var val = e.target.value;
+        var x = parseFloat(val);
+        if (x) {
+          // from http://www.free-condom-stuff.com/education/research.htm
+          var result = compute(x, 12.63, 1.29);
+          // from 10.3969/j.issn.1001-1420.2007.11.009
+          var result2 = compute(x, 10.18, 1.26);
+          result *= 100;
+          result = result.toFixed(2) + "%";
+          result2 *= 100;
+          result2 = result2.toFixed(2) + "%";
+          document.getElementById("girthResult").innerHTML = "You beat " + result + " men in the world." + "<br>" +
+            "You beat " + result2 + " men in China.";
+        } else {
+          document.getElementById("girthResult").innerHTML = "Invalid input";
+        }
+      }
+    </script>
+    
+    <div style="width: 400px; margin: 0 auto;">
+      
+      <label>Your erect length and press enter (cm):</label>
+      <br>
+      <br>
+      <input type="text" onchange="DoLength(event)" placeholder="cm">
+      <br>
+      <label id="lengthResult">result</label>
+      
+      <br>
+      <br>
+      <br> 
+      
+      <label>Your erect girth and press enter (cm):</label>
+      <br>
+      <br>
+      <input type="text" onchange="DoGirth(event)" placeholder="cm">
+      <br>
+      <label id="girthResult">result</label>
+      
+      <br>
+      <br>
+      <label>Just for fun!</label>
+      
+    </div>
+    
+  </body>
+</html>

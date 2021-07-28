@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Calculate Score</title>
+	<script>
+	</script>
+</head>
+<body>
+	<div style="width: 90%; text-align: center; margin: auto;">
+		单选数量：<input id="single" type="number" value="17" />
+		多选（空的）数量：<input id="multi" type="number" value="12" />（例如2道多选题有8个空，这里就是8）
+		<br>
+		单选对一道得分：<input id="singleGet" type="number" value="12" />
+		单选错一道扣分：<input id="singleLost" type="number" value="4" />
+		<br>
+		多选对一空得分：<input id="multiGet" type="number" value="3" />
+		多选错一空扣分：<input id="multiLost" type="number" value="3" />
+		<br>
+		<button id="generate">生成表格</button>
+		输入你的分数，点击计算对错几道：<input id="score" type="number" value="240" />
+		<button id="check">判断对错</button>
+		<br>
+		第1次作业分数：<input id="score1" type="number" value="" />
+		第2次：<input id="score2" type="number" value="" />
+		第3次：<input id="score3" type="number" value="" />
+		第4次：<input id="score4" type="number" value="" />
+		<button id="forecast">预测分数</button>
+		<br>
+		<div id="table" style="width: 50%; margin: auto;">
+		</div>
+	</div>
+
+	<script>
+	var single = document.getElementById("single");
+	var multi = document.getElementById("multi");
+	var singleGet = document.getElementById("singleGet");
+	var singleLost = document.getElementById("singleLost");
+	var multiGet = document.getElementById("multiGet");
+	var multiLost = document.getElementById("multiLost");
+	var score = document.getElementById("score");
+	
+	var singleValue;
+	var multiValue;
+	var singleGetValue;
+	var singleLostValue;
+	var multiGetValue;
+	var multiLostValue;
+	var scoreValue;
+	
+	function GetValue() {
+		singleValue = single.valueOf().value;
+		multiValue = multi.valueOf().value;
+		singleGetValue = singleGet.valueOf().value;
+		singleLostValue = singleLost.valueOf().value;
+		multiGetValue = multiGet.valueOf().value;
+		multiLostValue = multiLost.valueOf().value;
+		scoreValue = score.valueOf().value;
+		
+		
+		singleValue = parseInt(singleValue);
+		multiValue = parseInt(multiValue);
+		singleGetValue = parseInt(singleGetValue);
+		singleLostValue = parseInt(singleLostValue);
+		multiGetValue = parseInt(multiGetValue);
+		multiLostValue = parseInt(multiLostValue);
+		scoreValue = parseInt(scoreValue);
+		
+	}
+	
+	var generate = document.getElementById("generate");
+	var check = document.getElementById("check");
+	var forecast = document.getElementById("forecast");
+	
+	function CalculateTable () {
+		GetValue();
+		var table = [];
+		for (var i = 0; i <= singleValue; i++) {
+			var row = [];
+			for (var j = 0; j <= multiValue; j++) {
+				var v = i * singleGetValue + j * multiGetValue;
+				v -= singleLostValue * (singleValue - i);
+				v -= multiLostValue * (multiValue - j);
+				row.push(v);
+			}
+			table.push(row);
+		}
+		return table;
+	}
+	
+	function GenerateTable() {
+		document.getElementById("table").innerHTML = "";
+		var data = CalculateTable();
+		var table = document.createElement("table");
+		table.style = "width: 100%; border: 1px solid black;";
+		for (var i = -1; i <= singleValue; i++) {
+			var tr = document.createElement("tr");
+			var first = document.createElement("td");
+			if (i !== -1) {
+				first.innerHTML = i.toString();
+				first.style = "font-weight: bold; font-size: 1.2em;";
+			} else {
+				first.innerHTML = "";
+			}
+			tr.appendChild(first);
+			
+			for (var j = 0; j <= multiValue; j++) {
+				var td = document.createElement("td");
+				if (i !== -1) {
+					td.innerHTML = data[i][j].toString();
+					if (i > 0 && i%2==1 && j%2==0)
+						td.style = "background: #EDEDED;";
+					if (j > 0 && j%2==1 && i%2==0)
+						td.style = "background: #EDEDED;";
+				} else {
+					td.innerHTML = j.toString();
+					td.style = "font-weight: bold; font-size: 1.2em;";
+				}
+				tr.appendChild(td);
+			}
+			table.appendChild(tr);
+		}
+		document.getElementById("table").appendChild(table);
+	}
+	
+	function Check () {
+		GenerateTable();
+		var data = CalculateTable();
+		var result = "";
+		for (var i in data) {
+			for (var j in data[i]) {
+				if (data[i][j] == scoreValue) {
+					result += "单选对了" + i + "道，多选对了" + j + "道\n";
+				}
+			}
+		}
+		if (result === "") {
+			alert("分数错误");
+		} else {
+			alert(result);
+		}
+	}
+	
+	function Forecast () {
+		var score1 = document.getElementById("score1").valueOf().value;
+		var score2 = document.getElementById("score2").valueOf().value;
+		var score3 = document.getElementById("score3").valueOf().value;
+		var score4 = document.getElementById("score4").valueOf().value;
+		
+		score1 = parseInt(score1);
+		score2 = parseInt(score2);
+		score3 = parseInt(score3);
+		score4 = parseInt(score4);
+		
+		var list = [];
+		if (isNaN(score1) === false)
+			list.push(score1);
+		else
+			list.push(0);
+			
+		if (isNaN(score2) === false)
+			list.push(score2);
+		else
+			list.push(0);
+			
+		if (isNaN(score3) === false)
+			list.push(score3);
+		else
+			list.push(0);
+			
+		if (isNaN(score4) === false)
+			list.push(score4);
+		else
+			list.push(0);
+		
+		list = list.sort(function (a,b) {return a-b;});
+		console.log(list);
+		var sum = 0;
+		
+		var str = "( ";
+		str += "0.5*" + list[0];
+		str += " + 1.5*" + list[list.length - 1];
+		sum = 0.5*list[0];
+		sum += 1.5*list[list.length - 1];
+		for (var i = 1; i < (list.length - 1); i++) {
+			str += " + " + list[i];
+			sum += list[i];
+		}
+		str += ") / " + list.length;
+		
+		var average = sum / list.length;
+		alert("输入的课程分数为 " + average + "\n168分为及格\n" + str);
+	}
+	
+	check.onclick = Check;
+	generate.onclick = GenerateTable;
+	forecast.onclick = Forecast;
+	</script>
+</body>
+</html>
